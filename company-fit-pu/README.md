@@ -1,24 +1,53 @@
 # company-fit-pu
 
-Positive-Unlabeled (PU) learning for company fit scoring.
+Positive-Unlabeled (PU) company-fit ranking. Pilot: Flagship fund, ETS sector.
+**Stage: preprocessing only; no model is trained yet.**
+
+`IS_LABELED_POSITIVE`: 1 = known positive, 0 = **unlabeled** (not a confirmed negative).
 
 ## Layout
 
 | Path | Purpose |
 |------|---------|
-| `data/` | Raw inputs (e.g. `flagship_ets_train.csv`); gitignored |
-| `src/preprocess.py` | Load, clean, and split data; each step is an independent function |
-| `artifacts/` | Generated outputs (processed data, models); gitignored |
+| `src/config.py` | Column roles, TF-IDF settings, missing tokens, reference year |
+| `src/cleaning.py` | Stateless deterministic cleaning (numeric, text, categorical) |
+| `src/audit.py` | ID/label validation and audit report |
+| `src/pipeline.py` | Build/fit/save/load sklearn `ColumnTransformer`; `transform()` for new data |
+| `src/preprocess.py` | CLI: fit on training file, save artifacts, verify |
+| `data/`, `artifacts/`, `work/` | Inputs and generated outputs; gitignored |
 
 ## Setup
 
 ```bash
-python -m venv .venv && source .venv/bin/activate
-pip install -r requirements.txt
+python3 -m venv .venv && source .venv/bin/activate
+pip install -r requirements.txt      # from the repo root
 ```
 
-## Usage
+## Run (from `company-fit-pu/`)
 
 ```bash
-python -m src.preprocess --input data/flagship_ets_train.csv --output artifacts/train_processed.csv
+python -m src.preprocess --input data/flagship_ets_training.csv --output-dir artifacts
 ```
+
+Writes to `artifacts/`: `preprocessor.joblib`, `feature_config.json`, `X_train.npz`,
+`row_mapping.csv` (ID, label), `feature_names.txt`, `audit_report.json`,
+`package_versions.json`. The run fails if row alignment, finiteness, sparsity, or
+artifact reload checks fail.
+
+## Scoring future data (never refit)
+
+```python
+from pathlib import Path
+from src import pipeline
+from src.preprocess import load_raw
+pre = pipeline.load_artifacts(Path("artifacts"))["preprocessor"]
+X, ids = pipeline.transform(pre, load_raw(Path("data/new_companies.csv")))
+```
+
+## Baseline decisions
+
+- Missing tokens: `\N`, `\\N`, empty, `nan`, `none`, `null`. Missing is never zero-filled.
+- `NUM_OF_EMPLOYEES == 0` is treated as missing. Negative/non-finite numbers become missing and are counted.
+- log1p on employees, revenue, capital raised; median impute + standard scale. No missingness indicators.
+- `COMPANY_AGE` is used as given (derived relative to 2026; consistency is audited).
+- Excluded: `YEAR_FOUNDED`, `MOST_RECENT_FUNDING_AMT`, names, URLs.
