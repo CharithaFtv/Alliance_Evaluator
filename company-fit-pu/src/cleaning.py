@@ -114,6 +114,10 @@ def clean_frame(df: pd.DataFrame) -> CleanResult:
     issues = {}
     for col in C.NUMERIC:
         out[col], issues[col] = clean_numeric(df[col], col in C.ZERO_AS_MISSING)
+        if col in C.MONEY_CUTOFF_MILLIONS:
+            as_units = out[col] >= C.MONEY_CUTOFF_MILLIONS[col]
+            issues[col]["already_millions"] = int((out[col] < C.MONEY_CUTOFF_MILLIONS[col]).sum())
+            out.loc[as_units, col] /= 1e6
     for col in C.CATEGORICAL:
         out[col] = clean_categorical(df[col])
     out[C.TEXT_COLUMN], failures = build_business_text(df)

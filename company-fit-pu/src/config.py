@@ -16,14 +16,21 @@ LINEAR_NUMERIC = ["COMPANY_AGE", "TAM_B", "SAM_B"]
 NUMERIC = LOG_NUMERIC + LINEAR_NUMERIC
 ZERO_AS_MISSING = ["NUM_OF_EMPLOYEES"]  # baseline choice: 0 employees = unknown
 
-CATEGORICAL = ["OWNERSHIP", "COUNTRY", "SUBSECTOR", "REVENUE_RANGE"]
+# Money columns are modelled in $M. Sources mix $M and raw $ (a sparse gap separates
+# them), so values below the cutoff are taken as already in $M, the rest as $.
+MONEY_CUTOFF_MILLIONS = {"TOTAL_CAPITAL_RAISED": 50_000, "REVENUE": 1_000}
+
+# OWNERSHIP and REVENUE_RANGE are excluded: OWNERSHIP separates positives from
+# unlabeled in training but not validation (sourcing artefact); REVENUE_RANGE
+# duplicates REVENUE.
+CATEGORICAL = ["COUNTRY", "SUBSECTOR"]
 
 TEXT_SOURCES = ["DESCRIPTION", "TAGS", "GR_PRODUCTS_AND_SERVICES"]
 TEXT_COLUMN = "BUSINESS_TEXT"
 
 # Excluded from model inputs: YEAR_FOUNDED (redundant with COMPANY_AGE),
 # MOST_RECENT_FUNDING_AMT (low coverage), names/URLs (linking only).
-AUDIT_ONLY = ["YEAR_FOUNDED", "MOST_RECENT_FUNDING_AMT"]
+AUDIT_ONLY = ["YEAR_FOUNDED", "MOST_RECENT_FUNDING_AMT", "OWNERSHIP", "REVENUE_RANGE"]
 
 REFERENCE_YEAR = 2026  # COMPANY_AGE was derived relative to this year
 SUSPECT_AGE_MAX = 150  # ages above this are flagged, not altered

@@ -10,3 +10,4 @@ artifacts/
 work/
 *.joblib
 *.npz
+artifacts_final/
