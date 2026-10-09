@@ -1,0 +1,12 @@
+.venv/
+.env
+.env.*
+__pycache__/
+.DS_Store
+
+# Confidential company data and generated model artifacts
+data/
+artifacts/
+work/
+*.joblib
+*.npz
