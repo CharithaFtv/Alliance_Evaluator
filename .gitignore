@@ -11,3 +11,12 @@ work/
 *.joblib
 *.npz
 artifacts_final/
+!.env.example
+*.p8
+*.pem
+
+# Firm-internal knowledge copies (keep MANIFEST.md tracked)
+subsector-classifier/knowledge/*
+!subsector-classifier/knowledge/MANIFEST.md
+subsector-classifier/work/
+subsector-classifier/runs/
