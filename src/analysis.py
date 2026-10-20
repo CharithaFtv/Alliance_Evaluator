@@ -10,7 +10,7 @@ from features import CAT_COLS, MULTI
 
 pd.set_option("display.width", 200)
 GROUPS = {
-    "subsector": ["SUBSECTOR"], "main_industry": ["MAIN_INDUSTRY"],
+    "main_industry": ["MAIN_INDUSTRY"],
     "country_state": ["COUNTRY", "STATE", "ec_top_pct", "ec_n", "ec_us_pct"],
     "ownership": ["OWNERSHIP"], "is_bootstrapped": ["IS_BOOTSTRAPPED"], "type": ["TYPE"],
     "revenue_range": ["REVENUE_RANGE"], "revenue_size": ["revenue_m", "revenue_per_emp_k"],
@@ -82,7 +82,7 @@ def main():
                        "no headcount trend": GROUPS["headcount_trend"],
                        "no investors": GROUPS["investors"],
                        "no multi-valued tags/products/etc": list(MULTI),
-                       "no subsector/main_industry": ["SUBSECTOR", "MAIN_INDUSTRY"]}.items():
+                       "no main_industry": ["MAIN_INDUSTRY"]}.items():
         Xa = neutralise(Xt, cols)
         o = M.grouped_oof(mk, Xa, y, folds)
         rows.append((name, roc_auc_score(y, o), roc_auc_score(y[hard], o[hard])))

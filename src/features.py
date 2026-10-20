@@ -94,6 +94,9 @@ MISSING_FLAGS = ["capital_raised_m", "last_funding_m", "hc_latest", "ec_top_pct"
 CAT_COLS = ["COUNTRY", "STATE", "OWNERSHIP", "TYPE", "IS_BOOTSTRAPPED", "SUBSECTOR",
             "MAIN_INDUSTRY", "MOST_RECENT_FUNDING_STAGE", "REVENUE_RANGE"]
 TEXT_COL = "text"
+# Parsed into X (kept for reporting/baselines) but never given to the model, by user decision:
+# subsector information should come from description/tags/products text instead.
+NOT_FEATURES = {"SUBSECTOR"}
 
 
 def engineer(df):
@@ -166,7 +169,7 @@ def build_features(n_svd=60, seed=42):
         ("miss", Pipeline([("ind", FunctionTransformer(_is_missing,
                                                        feature_names_out="one-to-one"))]), MISSING_FLAGS),
         ("cat", OneHotEncoder(handle_unknown="infrequent_if_exist", min_frequency=20,
-                              sparse_output=False), CAT_COLS),
+                              sparse_output=False), [c for c in CAT_COLS if c not in NOT_FEATURES]),
         ("text", Pipeline([("tfidf", TfidfVectorizer(min_df=5, max_df=0.5, ngram_range=(1, 2),
                                                      stop_words="english", sublinear_tf=True)),
                            ("svd", TruncatedSVD(n_svd, random_state=seed))]), TEXT_COL),
