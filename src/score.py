@@ -16,7 +16,10 @@ from scipy.special import logit
 from features import CAT_COLS, assert_no_forbidden, engineer
 from loader import add_money_cols
 
-ART = "artifacts"
+import os
+
+# production refit (train + test) is used when present; the pre-refit train-only model is the fallback
+ART = "artifacts/production" if os.path.exists("artifacts/production/models.joblib") else "artifacts"
 KEY_FIELDS = ["DESCRIPTION", "YEAR_FOUNDED", "NUM_OF_EMPLOYEES", "revenue_m", "capital_raised_m",
               "COUNTRY", "SUBSECTOR", "INVESTORS", "MOST_RECENT_FUNDING_STAGE", "EMPLOYEE_COUNT_BY_MONTH"]
 REQUIRED_RAW = ["DESCRIPTION", "TAGS", "YEAR_FOUNDED", "OWNERSHIP", "NUM_OF_EMPLOYEES", "STATE", "COUNTRY",
