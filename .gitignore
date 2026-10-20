@@ -20,3 +20,6 @@ subsector-classifier/knowledge/*
 !subsector-classifier/knowledge/MANIFEST.md
 subsector-classifier/work/
 subsector-classifier/runs/
+
+# Confidential firm data
+historical_data/
